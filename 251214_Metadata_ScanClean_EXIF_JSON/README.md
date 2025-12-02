@@ -152,7 +152,7 @@ SNS投稿、共有、動画制作、ブログ掲載の前の「最終セキュ�
 
 
 
-👉 https://github.com/RogoAI-Takeji/for\_youtube/releases
+👉 <https://github.com/RogoAI-Takeji/for\_youtube/releases>
 
 
 
@@ -264,9 +264,9 @@ A. GPS / Exif 情報は除去しますが、
 
 
 
-\- YouTube: https://www.youtube.com/@老後AI  
+\- YouTube: <https://www.youtube.com/@老後AI>
 
-\- GitHub: https://github.com/RogoAI-Takeji  
+\- GitHub: <https://github.com/RogoAI-Takeji>
 
 
 
