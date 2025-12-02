@@ -2,7 +2,7 @@
 
 画像や動画ファイルのメタデータ（個人情報やAI生成パラメータ）を検知し、削除するためのWindowsデスクトップアプリです。
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 概要 (Overview)
