@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Metadata Scan&Clean v2.0.0 (Global)
+Metadata Scan&Clean v2.0.1 (Global - Silent Fix)
 takejii_app_001
-Multi-language support (JP/EN) added.
+Fixed: Suppressed flashing console windows during subprocess calls (FFmpeg/FFprobe).
 """
 
 import os
@@ -24,10 +24,14 @@ from tkinter import ttk, filedialog, messagebox, scrolledtext
 # ==========================================
 # 🌍 LANGUAGE SETTINGS / 言語設定
 # ==========================================
-# Change this to 'JP' for Japanese, 'EN' for English
-# ここを 'JP' にすると日本語、'EN' にすると英語になります
-LANGUAGE = 'EN' 
+LANGUAGE = 'JP' 
 # ==========================================
+
+# ■■■ FIX: ウィンドウ点滅防止用のフラグ設定 ■■■
+# Windowsの場合のみ、サブプロセス(FFmpeg)のウィンドウを表示しない設定を行う
+creation_flags = 0
+if sys.platform == "win32":
+    creation_flags = 0x08000000  # CREATE_NO_WINDOW
 
 TRANSLATIONS = {
     'app_title': {'JP': 'Metadata Scan&Clean', 'EN': 'Metadata Scan & Clean'},
@@ -121,7 +125,7 @@ def remove_readonly(func, path, _):
         pass
 
 class MetadataApp:
-    VERSION = "2.0.0"
+    VERSION = "2.0.1"
     APP_ID = "takejii_app_001"
     
     IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.tif', '.tiff', '.webp', '.bmp'}
@@ -131,7 +135,7 @@ class MetadataApp:
     def __init__(self, root):
         self.root = root
         self.root.title(f"{tr('app_title')} ({self.APP_ID}) v{self.VERSION}")
-        self.root.geometry("550x850") # Slightly wider for English text
+        self.root.geometry("550x850")
         
         self.log_queue = queue.Queue()
         self.ffmpeg_path = None
@@ -391,8 +395,9 @@ class MetadataApp:
                         info['has_author'] = True
             
             elif ext in (self.VIDEO_EXTS | self.AUDIO_EXTS) and self.ffprobe_path:
+                # ■■■ FIX: creationflagsを追加 ■■■
                 cmd = [self.ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', path]
-                res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore', timeout=3)
+                res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore', timeout=3, creationflags=creation_flags)
                 if res.returncode == 0:
                     data = json.loads(res.stdout)
                     tags = data.get('format', {}).get('tags', {})
@@ -576,7 +581,8 @@ class MetadataApp:
                 shutil.copy2(src, dst)
                 return True
 
-            subprocess.run(cmd, check=True)
+            # ■■■ FIX: creationflagsを追加 ■■■
+            subprocess.run(cmd, check=True, creationflags=creation_flags)
             if os.path.exists(temp):
                 if os.path.exists(dst): os.remove(dst)
                 os.rename(temp, dst)
@@ -634,8 +640,9 @@ class MetadataApp:
         
         if self.ffprobe_path and (ext in self.VIDEO_EXTS | self.AUDIO_EXTS):
             try:
+                # ■■■ FIX: creationflagsを追加 ■■■
                 cmd = [self.ffprobe_path, '-v', 'quiet', '-print_format', 'json', '-show_format', path]
-                res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore', timeout=5)
+                res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore', timeout=5, creationflags=creation_flags)
                 data = json.loads(res.stdout)
                 tags = data.get('format', {}).get('tags', {})
                 if not tags: text += "✓ No Metadata"
