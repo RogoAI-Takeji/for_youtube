@@ -33,6 +33,16 @@ creation_flags = 0
 if sys.platform == "win32":
     creation_flags = 0x08000000  # CREATE_NO_WINDOW
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 TRANSLATIONS = {
     'app_title': {'JP': 'Metadata Scan&Clean', 'EN': 'Metadata Scan & Clean'},
     'tab_clean': {'JP': 'クリーニング', 'EN': 'Cleaning'},
@@ -136,7 +146,13 @@ class MetadataApp:
         self.root = root
         self.root.title(f"{tr('app_title')} ({self.APP_ID}) v{self.VERSION}")
         self.root.geometry("550x850")
-        
+        # 【ここに追加！】アイコン設定
+        # try-exceptで囲むと、万が一アイコンがなくてもエラーで落ちません
+        try:
+            self.root.iconbitmap(default=resource_path("icon.ico"))
+        except:
+            pass
+
         self.log_queue = queue.Queue()
         self.ffmpeg_path = None
         self.ffprobe_path = None
