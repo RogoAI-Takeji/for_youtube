@@ -51,8 +51,26 @@ CUDA_AVAILABLE = torch.cuda.is_available()
 CUDA_DEVICE = torch.cuda.get_device_name(0) if CUDA_AVAILABLE else "CPU"
 # ==========================================
 
+# ★追加: FFmpegのパスを特定してpydubに設定する関数
+def setup_ffmpeg():
+    # 1. 自身のフォルダ内の ffmpeg/ffmpeg.exe を探す
+    base_path = Path(__file__).parent
+    ffmpeg_exe = base_path / "ffmpeg" / "ffmpeg.exe"
+    ffprobe_exe = base_path / "ffmpeg" / "ffprobe.exe"
+    
+    # 2. 見つかったら pydub に設定
+    if ffmpeg_exe.exists():
+        AudioSegment.converter = str(ffmpeg_exe)
+        AudioSegment.ffmpeg = str(ffmpeg_exe)
+        AudioSegment.ffprobe = str(ffprobe_exe)
+        print(f"Local FFmpeg loaded: {ffmpeg_exe}")
+    else:
+        print("Local FFmpeg not found. Using system default.")
+
 class VoicevoxCoquiGUI:
     def __init__(self, root):
+        setup_ffmpeg()  # ★ここで実行！
+        
         self.root = root
         gpu_status = f"GPU: {CUDA_DEVICE}" if CUDA_AVAILABLE else "CPU Mode"
         self.root.title(f"🎙️ ROGOAI Voice Studio v1.9 JP - {gpu_status}")

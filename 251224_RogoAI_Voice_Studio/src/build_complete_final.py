@@ -62,6 +62,11 @@ def create_edition(lang):
     if os.path.exists("make_icon"):
         shutil.copytree("make_icon", os.path.join(target_dir, "make_icon"))
 
+# ★追加: FFmpeg (あればコピー)
+    if os.path.exists("ffmpeg"):
+        print(f"  FFmpegを同梱中...")
+        shutil.copytree("ffmpeg", os.path.join(target_dir, "ffmpeg"))
+
     # 4. requirements.txt 作成
     with open(os.path.join(target_dir, "requirements.txt"), 'w', encoding='utf-8') as f:
         f.write(REQUIREMENTS_CONTENT)
